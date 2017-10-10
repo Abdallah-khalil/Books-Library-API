@@ -26,9 +26,19 @@
     "debug": "^3.0.1",
     "express": "^4.15.4",
     "http": "0.0.0",
-    "mongoose": "^4.11.12"
+    "mongoose": "^4.11.12",
+    "@nestjs/common": "^4.0.1",
+    "@nestjs/core": "^4.0.1",
+    "@nestjs/microservices": "^4.0.1",
+    "@nestjs/testing": "^4.0.1",
+    "@nestjs/websockets": "^4.0.1",
+    "body-parser": "^1.17.2",
+    "redis": "^2.7.1",
+    "reflect-metadata": "^0.1.10",
+    "rxjs": "^5.4.3"
   },
   "devDependencies": {
+    "@types/body-parser": "^1.16.5",
     "@types/debug": "0.0.30",
     "@types/express": "^4.0.37",
     "@types/mongodb": "^2.2.11",

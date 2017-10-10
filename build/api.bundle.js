@@ -60,66 +60,80 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 1);
+/******/ 	return __webpack_require__(__webpack_require__.s = 3);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
 /***/ (function(module, exports) {
 
-module.exports = require("express");
+module.exports = require("@nestjs/common");
 
 /***/ }),
 /* 1 */
+/***/ (function(module, exports) {
+
+module.exports = require("mongoose");
+
+/***/ }),
+/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const http = __webpack_require__(2);
-const app_1 = __webpack_require__(3);
-const port = normalizePort(process.env.PORT || 3030);
-app_1.default.set('port', port);
-const server = http.createServer(app_1.default);
-server.listen(port);
-server.on('error', onError);
-server.on('listening', onListening);
-function normalizePort(val) {
-    let port = (typeof val === 'string') ? parseInt(val, 10) : val;
-    if (isNaN(port))
-        return val;
-    else if (port >= 0)
-        return port;
-    else
-        return false;
-}
-function onError(error) {
-    if (error.syscall !== 'listen')
-        throw error;
-    let bind = (typeof port === 'string') ? 'Pipe ' + port : 'Port ' + port;
-    switch (error.code) {
-        case 'EACCES':
-            process.exit(1);
-            break;
-        case 'EADDRINUSE':
-            process.exit(1);
-            break;
-        default:
-            throw error;
+const mongoose_1 = __webpack_require__(1);
+const common_1 = __webpack_require__(0);
+let BookService = class BookService {
+    constructor(BookModel) {
+        this.BookModel = BookModel;
     }
-}
-function onListening() {
-    let addr = server.address();
-    let bind = (typeof addr === 'string') ? `pipe ${addr}` : `port ${addr.port}`;
-    console.log(`Listening on ${bind}`);
-}
+    async findAll(reqQuery) {
+        let query = {};
+        if (reqQuery.genre) {
+            query.genre = reqQuery.genre;
+        }
+        return await this.BookModel.find(query).exec();
+    }
+    async findBook(bookId) {
+        return await this.BookModel.findById(bookId);
+    }
+    async addBook(addDookDTO) {
+        const createdBook = new this.BookModel(addDookDTO);
+        return await createdBook.save();
+    }
+    async editBook(addBookDTO, book) {
+        const editedBook = book;
+        editedBook.title = addBookDTO.title;
+        editedBook.genre = addBookDTO.genre;
+        editedBook.author = addBookDTO.author;
+        editedBook.read = addBookDTO.read;
+        return await editedBook.save();
+    }
+    async deleteBook(book) {
+        await book.remove();
+        return "Deleted Successfully";
+    }
+};
+BookService = __decorate([
+    common_1.Component(),
+    __param(0, common_1.Inject('bookModelToken')),
+    __metadata("design:paramtypes", [mongoose_1.Model])
+], BookService);
+exports.BookService = BookService;
 
-
-/***/ }),
-/* 2 */
-/***/ (function(module, exports) {
-
-module.exports = require("http");
 
 /***/ }),
 /* 3 */
@@ -128,91 +142,28 @@ module.exports = require("http");
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const express = __webpack_require__(0);
-const book_router_1 = __webpack_require__(4);
-class app {
-    constructor() {
-        this.expressApp = express();
-        this.middlewareConfig();
-        this.routesConfig();
-    }
-    routesConfig() {
-        this.expressApp.use("/api", book_router_1.default);
-        this.expressApp.use('/', (req, res, next) => {
-            res.send('Welcome to the fucken shit');
-        });
-    }
-    middlewareConfig() {
-    }
-    ;
+const bodyParser = __webpack_require__(4);
+const core_1 = __webpack_require__(5);
+const app_module_1 = __webpack_require__(6);
+async function bootstrap() {
+    const app = await core_1.NestFactory.create(app_module_1.ApplicationModule);
+    app.use(bodyParser.json());
+    await app.listen(3001);
 }
-exports.default = new app().expressApp;
+bootstrap();
 
 
 /***/ }),
 /* 4 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, exports) {
 
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = __webpack_require__(0);
-const book_controller_1 = __webpack_require__(5);
-class BookRouter {
-    constructor() {
-        this.router = express_1.Router();
-        this.init();
-    }
-    init() {
-        this.router.get("/Books", this.getBooks);
-        this.router.get("/Books/:bookId", this.getBookById);
-    }
-    getBooks(req, res, next) {
-        book_controller_1.BookController.getBooks(req.query).then((books) => {
-            res.json(books);
-        }).catch((error) => {
-            res.status(500).send(error);
-        });
-    }
-    ;
-    getBookById(req, res, next) {
-        book_controller_1.BookController.getBookById(req.params.bookId).then((book) => {
-            res.json(book);
-        }).catch((error) => {
-            res.status(500).send(error);
-        });
-    }
-    ;
-}
-exports.default = new BookRouter().router;
-
+module.exports = require("body-parser");
 
 /***/ }),
 /* 5 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, exports) {
 
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-const book_model_1 = __webpack_require__(6);
-class BookController {
-    constructor() {
-    }
-    static getBooks(reqQuery) {
-        let query = {};
-        if (reqQuery.genre) {
-            query.genre = reqQuery.genre;
-        }
-        return book_model_1.bookModel.find(query).exec();
-    }
-    ;
-    static getBookById(bookId) {
-        return book_model_1.bookModel.findById(bookId).exec();
-    }
-    ;
-}
-exports.BookController = BookController;
-
+module.exports = require("@nestjs/core");
 
 /***/ }),
 /* 6 */
@@ -220,12 +171,135 @@ exports.BookController = BookController;
 
 "use strict";
 
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const mongoose_1 = __webpack_require__(8);
-const dataAccess_1 = __webpack_require__(7);
-const mongoose = dataAccess_1.default.mongooseInstance;
-const mongooseConn = dataAccess_1.default.mongooseConnection;
-let bookSchema = new mongoose_1.Schema({
+const common_1 = __webpack_require__(0);
+const book_module_1 = __webpack_require__(7);
+let ApplicationModule = class ApplicationModule {
+};
+ApplicationModule = __decorate([
+    common_1.Module({
+        modules: [book_module_1.BookModule]
+    })
+], ApplicationModule);
+exports.ApplicationModule = ApplicationModule;
+
+
+/***/ }),
+/* 7 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const common_1 = __webpack_require__(0);
+const dbConfig_module_1 = __webpack_require__(8);
+const book_providers_1 = __webpack_require__(10);
+const book_service_1 = __webpack_require__(2);
+const book_controller_1 = __webpack_require__(12);
+const getBook_middleware_1 = __webpack_require__(14);
+let BookModule = class BookModule {
+    configure(consumer) {
+        consumer.apply(getBook_middleware_1.GetBookMiddleware).forRoutes({ path: 'api/book/:bookId', method: common_1.RequestMethod.GET }, { path: 'api/book/:bookId', method: common_1.RequestMethod.PUT }, { path: 'api/book/:bookId', method: common_1.RequestMethod.PATCH }, { path: 'api/book/:bookId', method: common_1.RequestMethod.DELETE });
+    }
+};
+BookModule = __decorate([
+    common_1.Module({
+        modules: [dbConfig_module_1.dbConfigModule],
+        components: [
+            book_service_1.BookService,
+            ...book_providers_1.BookProviders
+        ],
+        controllers: [book_controller_1.BookController]
+    })
+], BookModule);
+exports.BookModule = BookModule;
+
+
+/***/ }),
+/* 8 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const common_1 = __webpack_require__(0);
+const dbConfig_providers_1 = __webpack_require__(9);
+let dbConfigModule = class dbConfigModule {
+};
+dbConfigModule = __decorate([
+    common_1.Module({
+        components: [...dbConfig_providers_1.dbConfigProviders],
+        exports: [...dbConfig_providers_1.dbConfigProviders]
+    })
+], dbConfigModule);
+exports.dbConfigModule = dbConfigModule;
+
+
+/***/ }),
+/* 9 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+const mongoose = __webpack_require__(1);
+exports.dbConfigProviders = [
+    {
+        provide: 'DbConToken',
+        useFactory: async () => {
+            mongoose.Promise = global.Promise;
+            return await mongoose.connect('mongodb://localhost:27017/libraryApp', {
+                useMongoClient: true,
+            });
+        },
+    },
+];
+
+
+/***/ }),
+/* 10 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+const book_schema_1 = __webpack_require__(11);
+exports.BookProviders = [
+    {
+        provide: 'bookModelToken',
+        useFactory: async (connection) => connection.model('Book', book_schema_1.BookSchema),
+        inject: ['DbConToken']
+    }
+];
+
+
+/***/ }),
+/* 11 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+const mongoose_1 = __webpack_require__(1);
+exports.BookSchema = new mongoose_1.Schema({
     title: {
         type: String
     },
@@ -240,41 +314,154 @@ let bookSchema = new mongoose_1.Schema({
         default: false
     }
 });
-exports.bookModel = mongooseConn.model('Book', bookSchema);
 
 
 /***/ }),
-/* 7 */
+/* 12 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const common_1 = __webpack_require__(0);
+const book_service_1 = __webpack_require__(2);
+const addBook_dto_1 = __webpack_require__(13);
+let BookController = class BookController {
+    constructor(bookService) {
+        this.bookService = bookService;
+    }
+    async findAll(reqQuery) {
+        return await this.bookService.findAll(reqQuery);
+    }
+    async addBook(addBookDTO) {
+        return this.bookService.addBook(addBookDTO);
+    }
+    async findBook(request) {
+        return request.book;
+    }
+    async editBook(request) {
+        return this.bookService.editBook(request.body, request.book);
+    }
+    async patchBook(request) {
+        if (request.body._id) {
+            delete request.body._id;
+        }
+        return this.bookService.editBook(request.body, request.book);
+    }
+    async deleteBook(request) {
+        return this.bookService.deleteBook(request.book);
+    }
+};
+__decorate([
+    common_1.Get(),
+    __param(0, common_1.Query()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], BookController.prototype, "findAll", null);
+__decorate([
+    common_1.Post(),
+    __param(0, common_1.Body()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [addBook_dto_1.AddBookDTO]),
+    __metadata("design:returntype", Promise)
+], BookController.prototype, "addBook", null);
+__decorate([
+    common_1.Get("/:bookId"),
+    __param(0, common_1.Req()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], BookController.prototype, "findBook", null);
+__decorate([
+    common_1.Put("/:bookId"),
+    __param(0, common_1.Req()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], BookController.prototype, "editBook", null);
+__decorate([
+    common_1.Patch("/:bookId"),
+    __param(0, common_1.Req()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], BookController.prototype, "patchBook", null);
+__decorate([
+    common_1.Delete("/:bookId"),
+    __param(0, common_1.Req()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], BookController.prototype, "deleteBook", null);
+BookController = __decorate([
+    common_1.Controller('api/book'),
+    __metadata("design:paramtypes", [book_service_1.BookService])
+], BookController);
+exports.BookController = BookController;
+
+
+/***/ }),
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Mongoose = __webpack_require__(8);
-class DataAccess {
-    constructor() {
-        this.ConString = "mongodb://localhost:27017/libraryApp";
-        this.connect();
-    }
-    connect() {
-        if (this.mongooseInstance)
-            return this.mongooseInstance;
-        this.mongooseConnection = Mongoose.connection;
-        this.mongooseConnection.once("open", () => {
-            console.log("Connected to mongodb.");
-        });
-        this.mongooseInstance = Mongoose.connect(this.ConString, { useMongoClient: true, promiseLibrary: global.Promise });
-        return this.mongooseInstance;
-    }
+class AddBookDTO {
 }
-exports.default = new DataAccess();
+exports.AddBookDTO = AddBookDTO;
 
 
 /***/ }),
-/* 8 */
-/***/ (function(module, exports) {
+/* 14 */
+/***/ (function(module, exports, __webpack_require__) {
 
-module.exports = require("mongoose");
+"use strict";
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const common_1 = __webpack_require__(0);
+const book_service_1 = __webpack_require__(2);
+let GetBookMiddleware = class GetBookMiddleware {
+    constructor(bookService) {
+        this.bookService = bookService;
+    }
+    async resolve(...args) {
+        return async (req, res, next) => {
+            await this.bookService.findBook(req.params.bookId).then((book) => {
+                req.book = book;
+                next();
+            });
+        };
+    }
+};
+GetBookMiddleware = __decorate([
+    common_1.Middleware(),
+    __metadata("design:paramtypes", [book_service_1.BookService])
+], GetBookMiddleware);
+exports.GetBookMiddleware = GetBookMiddleware;
+
 
 /***/ })
 /******/ ]);

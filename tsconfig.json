@@ -1,17 +1,25 @@
 {
     "compilerOptions": {
-        "target": "es2015",
-        "module": "commonjs",
-        "noImplicitAny": true,
-        "removeComments": true,
-        "preserveConstEnums": true,
-        "experimentalDecorators": true
+      "module": "commonjs",
+      "declaration": false,
+      "noImplicitAny": false,
+      "removeComments": true,
+      "noLib": false,
+      "emitDecoratorMetadata": true,
+      "experimentalDecorators": true,
+      "target": "es2017",
+      "sourceMap": true,
+      "allowJs": true,
+      "lib": [
+          "es2017",
+          "dom"
+      ]
     },
     "include": [
-        "src/**/*.ts"
+      "src/**/*"
     ],
     "exclude": [
-        "node_modules"
+      "node_modules",
+      "**/*.spec.ts"
     ]
-}
-
+  }
