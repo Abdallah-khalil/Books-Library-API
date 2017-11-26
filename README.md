@@ -1,2 +1,2 @@
-# RESTFULL WEBSERVICE
-restfull webservice with nodejs , express , monogoodb ,  typescript and  webpack 
+# Books Library API
+A book store restful api built with nestjs, nodejs , express , monogoodb , mongoose 

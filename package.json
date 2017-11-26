@@ -8,7 +8,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "webpack --w"
+    "start": "nodemon --watch ./src --exec ts-node ./src/index.ts"
   },
   "keywords": [
     "nodejs",
@@ -23,22 +23,24 @@
   "author": "abdallah khalil",
   "license": "ISC",
   "dependencies": {
-    "debug": "^3.0.1",
-    "express": "^4.15.4",
-    "http": "0.0.0",
-    "mongoose": "^4.11.12",
     "@nestjs/common": "^4.0.1",
     "@nestjs/core": "^4.0.1",
     "@nestjs/microservices": "^4.0.1",
     "@nestjs/testing": "^4.0.1",
     "@nestjs/websockets": "^4.0.1",
     "body-parser": "^1.17.2",
+    "cors": "^2.8.4",
+    "debug": "^3.0.1",
+    "express": "^4.15.4",
+    "http": "0.0.0",
+    "mongoose": "^4.11.12",
     "redis": "^2.7.1",
     "reflect-metadata": "^0.1.10",
     "rxjs": "^5.4.3"
   },
   "devDependencies": {
     "@types/body-parser": "^1.16.5",
+    "@types/cors": "^2.8.1",
     "@types/debug": "0.0.30",
     "@types/express": "^4.0.37",
     "@types/mongodb": "^2.2.11",
@@ -46,9 +48,7 @@
     "@types/node": "^8.0.30",
     "nodemon": "^1.12.1",
     "ts-loader": "^2.3.7",
-    "typescript": "^2.5.2",
-    "webpack": "^3.6.0",
-    "webpack-node-externals": "^1.6.0",
-    "webpack-shell-plugin": "^0.5.0"
+    "ts-node": "^3.3.0",
+    "typescript": "^2.5.2"
   }
 }
