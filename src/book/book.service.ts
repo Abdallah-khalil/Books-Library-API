@@ -17,7 +17,7 @@ export class BookService {
         return await this.BookModel.find(query).exec();
     }
 
-    async findBook(bookId: number): Promise<Book> {
+    async findBook(bookId: string): Promise<Book> {
         return await this.BookModel.findById(bookId);
     }
 
